@@ -1,5 +1,4 @@
 const http = require("http");
-const axios = require('axios');
 const { Pool} = require('pg')
 
 const pool = new Pool()
