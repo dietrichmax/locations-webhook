@@ -15,6 +15,17 @@ async function insertData(body) {
   }
 }
 
+async function getCoordinates() {
+  try {
+    const res = await pool.query(
+      "SELECT lat, lon FROM locations ORDER BY id DESC LIMIT 1"
+    );
+    console.log(`Added location ${res}`);
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 const server = http.createServer((request, response) => {
   let body = [];
   console.log(request.method)
@@ -25,6 +36,8 @@ const server = http.createServer((request, response) => {
         body = JSON.parse(Buffer.concat(body).toString());
         insertData(body)
       })
+  } else if (request.method === "GET") {
+    getCoordinates()
   }
 
   response.end();
