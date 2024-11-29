@@ -32,7 +32,6 @@ app.use(
 );
 
 app.get("/", async (req, res, next) => {
-    console.log(req.method)
     try {
         coordinates = await getCoordinates()
         coords = coordinates.rows[0]
@@ -44,17 +43,11 @@ app.get("/", async (req, res, next) => {
 });
 
 app.post("/", (req, res) => {
-    console.log(req.method)
-    
     try {
-        req.on('data', (chunk) => {
-            body.push(chunk);
-            }).on('end', () => {
-            body = JSON.parse(Buffer.concat(body).toString());
-            insertData(body)
-        })
+        insertData(req.body)
+        console.log(req.body)
     } catch (err) {
-        console.error(`Error while updating coordinates `, err.message);
+        console.error(`Error while updating locations `, err.message);
         next(err);
     }
 })
