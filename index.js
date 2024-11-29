@@ -31,40 +31,27 @@ app.use(
   })
 );
 
-
 app.get("/", async (req, res, next) => {
-
-    if (req.method === "POST") {
-        req.on('data', (chunk) => {
-         body.push(chunk);
-         }).on('end', () => {
-           body = JSON.parse(Buffer.concat(body).toString());
-           insertData(body)
-        })
-    } else if (req.method === "GET") {
-        try {
-            res.json(await getCoordinates());
-        } catch (err) {
-            console.error(`Error while getting coordinates `, err.message);
-            next(err);
-        }
-        coordinates = getCoordinates()
-        res.json();
+    try {
+        coordinates = await getCoordinates()
+        coords = coordinates.rows[0]
+        res.json(coords);
+    } catch (err) {
+        console.error(`Error while getting coordinates `, err.message);
+        next(err);
     }
-
-
-    
-        /*const coords = getCoordinates().then(res => {
-        const coords = res.rows[0]
-        return coords
-        })*/
-        
-
 });
 
-
+app.post("/", (req, res) => {
+    req.on('data', (chunk) => {
+        body.push(chunk);
+        }).on('end', () => {
+          body = JSON.parse(Buffer.concat(body).toString());
+          insertData(body)
+       })
+})
 
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Locations webhook app listening at http://localhost:${port}`);
 });
