@@ -1,9 +1,9 @@
 {
   "scripts": {
-    "start": "node locations.js"
+    "start": "node index.js"
   },
   "dependencies": {
-    "axios": "^1.6.5",
+    "express": "^4.21.1",
     "pg": "^8.11.3"
   }
 }
