@@ -32,6 +32,7 @@ app.use(
 );
 
 app.get("/", async (req, res, next) => {
+    console.log(req.method)
     try {
         coordinates = await getCoordinates()
         coords = coordinates.rows[0]
@@ -43,6 +44,7 @@ app.get("/", async (req, res, next) => {
 });
 
 app.post("/", (req, res) => {
+    console.log(req.method)
     req.on('data', (chunk) => {
         body.push(chunk);
         }).on('end', () => {
