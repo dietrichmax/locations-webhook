@@ -45,12 +45,18 @@ app.get("/", async (req, res, next) => {
 
 app.post("/", (req, res) => {
     console.log(req.method)
-    req.on('data', (chunk) => {
-        body.push(chunk);
-        }).on('end', () => {
-          body = JSON.parse(Buffer.concat(body).toString());
-          insertData(body)
-       })
+    
+    try {
+        req.on('data', (chunk) => {
+            body.push(chunk);
+            }).on('end', () => {
+            body = JSON.parse(Buffer.concat(body).toString());
+            insertData(body)
+        })
+    } catch (err) {
+        console.error(`Error while updating coordinates `, err.message);
+        next(err);
+    }
 })
 
 
