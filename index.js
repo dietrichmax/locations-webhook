@@ -20,7 +20,7 @@ async function insertData(body) {
 
 async function getCoordinates() {
   const res = await pool.query(
-    "SELECT lat, lon FROM locations ORDER BY id DESC LIMIT 1"
+    "SELECT lat, lon, batt, bs FROM locations ORDER BY id DESC LIMIT 1"
   );
   return res
 }
