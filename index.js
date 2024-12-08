@@ -19,10 +19,17 @@ async function insertData(body) {
 }
 
 async function getCoordinates() {
-  const res = await pool.query(
+  const coordinates = await pool.query(
     "SELECT lat, lon, batt, bs FROM locations ORDER BY id DESC LIMIT 1"
   );
-  return res
+  
+  const count = await pool.query(
+    "SELECT COUNT(*) FROM locations"
+  );
+  return {
+    ...coordinates.rows[0],
+    ...count.rows[0]
+  }
 }
 
 const server = http.createServer()
@@ -42,9 +49,10 @@ server.on("request", async (request, response) => {
     })
     response.end();
   } else if (request.method === "GET") {
-    const coords = await getCoordinates()
+    const data = await getCoordinates()
+    console.log(data)
     response.setHeader('Content-Type', 'application/json');
-    response.end(JSON.stringify(coords.rows[0]));
+    response.end(JSON.stringify(data));
   }
 });
 
