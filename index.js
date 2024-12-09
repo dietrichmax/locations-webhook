@@ -41,6 +41,7 @@ server.on("request", async (request, response) => {
     body.push(chunk);
     }).on('end', () => {
       body = JSON.parse(Buffer.concat(body).toString());
+      console.log(body)
       if (body.lon && body.lat) {
         insertData(body)
       } else {
@@ -50,7 +51,6 @@ server.on("request", async (request, response) => {
     response.end();
   } else if (request.method === "GET") {
     const data = await getCoordinates()
-    console.log(data)
     response.setHeader('Content-Type', 'application/json');
     response.end(JSON.stringify(data));
   }
