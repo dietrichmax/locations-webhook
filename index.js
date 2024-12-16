@@ -44,7 +44,6 @@ server.on("request", async (request, response) => {
     body.push(chunk);
     }).on('end', () => {
       body = JSON.parse(Buffer.concat(body).toString());
-      console.log("Requestbody" + body)
       if (body.lon && body.lat) {
         insertData(body)
       } else {
