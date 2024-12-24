@@ -1,18 +1,23 @@
 const http = require("http");
 const { Pool} = require('pg')
 
-const pool = new Pool()
+const pool = new Pool({
+  user: "max",
+  password: "B73g948jcab!",
+  host: "192.168.50.151",
+  port: 5432,
+  database: "playground"})
 
 async function insertData(body) {
-  const select = await pool.query(
-    `SELECT lat, lon FROM locations WHERE lat = ${body.lat} AND lon = ${body.lon}`
-  );
-
   let isDuplicate = false
-  if (select.rows[0].lat === body.lat && select.rows[0].lon === body.lon){
+  
+  const select = await pool.query(`SELECT lat, lon FROM locations WHERE lat = ${body.lat} AND lon = ${body.lon}`);
+  if (select.rows[0] && select.rows[0].lat === body.lat && select.rows[0].lon === body.lon){
     isDuplicate = true
     console.log(`duplicate: ${isDuplicate}`)
-  } else {
+  } 
+  
+  if (!isDuplicate) {
     const res = await pool.query(
       "INSERT INTO locations (lat, lon, acc, alt, batt, bs, tst, vac, vel, conn, topic, inregions, ssid, bssid) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
       [body.lat, body.lon, body.acc, body.alt, body.batt, body.bs, body.tst, body.vac, body.vel, body.conn, body.topic, body.inregions, body.ssid, body.bssid]
