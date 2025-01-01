@@ -1,12 +1,7 @@
 const http = require("http");
 const { Pool} = require('pg')
 
-const pool = new Pool({
-  user: "max",
-  password: "B73g948jcab!",
-  host: "192.168.50.151",
-  port: 5432,
-  database: "playground"})
+const pool = new Pool()
 
 async function insertData(body) {
   let isDuplicate = false
