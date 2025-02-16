@@ -12,7 +12,11 @@ COPY . .
 
 EXPOSE 3000
 
+# Add health check script
+COPY healthCheck.js /opt/app/healthCheck.js
+
+# Health check
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
+  CMD node /opt/app/healthCheck.js || exit 1
 
 CMD [ "npm", "run", "start"]
