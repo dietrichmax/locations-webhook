@@ -55,14 +55,12 @@ server.on("request", async (request, response) => {
     response.end();
   } else if (request.method === "GET") {
     if (request.url === "/health") {
-      const dbHealthy = await checkDatabase();
-      const healthStatus = {
-        status: dbHealthy ? "ok" : "error",
+      response.setHeader("Content-Type", "application/json");
+      response.end(JSON.stringify( {
+        status: "ok",
         uptime: process.uptime(),
         timestamp: new Date().toISOString(),
-      };
-      response.setHeader("Content-Type", "application/json");
-      response.end(JSON.stringify(healthStatus));
+      }));
     } else {
       const data = await getCoordinates();
       response.setHeader("Content-Type", "application/json");
