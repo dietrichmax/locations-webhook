@@ -36,27 +36,39 @@ async function getCoordinates() {
   }
 }
 
-const server = http.createServer()
+const server = http.createServer();
 
 server.on("request", async (request, response) => {
   let body = [];
+
   if (request.method === "POST") {
     request.on('data', (chunk) => {
-    body.push(chunk);
+      body.push(chunk);
     }).on('end', () => {
       body = JSON.parse(Buffer.concat(body).toString());
       if (body.lon && body.lat) {
-        insertData(body)
+        insertData(body);
       } else {
-        console.log("no coordinates")
+        console.log("no coordinates");
       }
-    })
+    });
     response.end();
   } else if (request.method === "GET") {
-    const data = await getCoordinates()
-    response.setHeader('Content-Type', 'application/json');
-    response.end(JSON.stringify(data));
+    if (request.url === "/health") {
+      const dbHealthy = await checkDatabase();
+      const healthStatus = {
+        status: dbHealthy ? "ok" : "error",
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+      };
+      response.setHeader("Content-Type", "application/json");
+      response.end(JSON.stringify(healthStatus));
+    } else {
+      const data = await getCoordinates();
+      response.setHeader("Content-Type", "application/json");
+      response.end(JSON.stringify(data));
+    }
   }
 });
 
-server.listen(3000);
+server.listen(3000, () => console.log("Server running on port 3000"));
