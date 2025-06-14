@@ -1,72 +1,107 @@
-const http = require("http");
-const { Pool} = require('pg')
+require('dotenv').config(); // Add this at the top
 
-const pool = new Pool()
+const express = require('express');
+const { Pool } = require('pg');
 
+const app = express();
+const PORT = 3000;
+
+// PostgreSQL connection pool config (adjust as needed)
+const pool = new Pool({
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+
+app.use(express.json());
+
+// Middleware to check for API key
+app.use((req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  if (!apiKey || apiKey !== process.env.API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid or missing API key' });
+  }
+  next();
+});
+
+
+// Insert data with duplication check
 async function insertData(body) {
-  let isDuplicate = false
-  console.log(body)
+  const query = `
+    INSERT INTO locations (lat, lon, acc, alt, batt, bs, tst, vac, vel, conn, topic, inregions, ssid, bssid)
+    SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+    WHERE NOT EXISTS (
+      SELECT 1 FROM locations WHERE lat = $1 AND lon = $2
+    )
+  `;
 
-  const select = await pool.query(`SELECT lat, lon FROM locations WHERE lat = ${body.lat} AND lon = ${body.lon}`);
-  if (select.rows[0] && select.rows[0].lat === body.lat && select.rows[0].lon === body.lon){
-    isDuplicate = true
-    console.log(`duplicate: ${isDuplicate}`)
-  } 
+  const values = [
+    body.lat, body.lon, body.acc, body.alt, body.batt,
+    body.bs, body.tst, body.vac, body.vel, body.conn,
+    body.topic, body.inregions, body.ssid, body.bssid
+  ];
 
-  if (!isDuplicate) {
-    const res = await pool.query(
-      "INSERT INTO locations (lat, lon, acc, alt, batt, bs, tst, vac, vel, conn, topic, inregions, ssid, bssid) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
-      [body.lat, body.lon, body.acc, body.alt, body.batt, body.bs, body.tst, body.vac, body.vel, body.conn, body.topic, body.inregions, body.ssid, body.bssid]
-    );
-    console.log(`Added location lat: ${body.lat}, lon: ${body.lon}`);
-  }
+  const result = await pool.query(query, values);
+  return result.rowCount > 0; // true if inserted
 }
 
+// Get latest coordinates and count
 async function getCoordinates() {
-  const coordinates = await pool.query(
-    "SELECT lat, lon, batt, bs FROM locations ORDER BY id DESC LIMIT 1"
-  );
-  
-  const count = await pool.query(
-    "SELECT COUNT(*) FROM locations"
-  );
+  const [coordResult, countResult] = await Promise.all([
+    pool.query("SELECT lat, lon, batt, bs FROM locations ORDER BY id DESC LIMIT 1"),
+    pool.query("SELECT COUNT(*) FROM locations"),
+  ]);
+
   return {
-    ...coordinates.rows[0],
-    ...count.rows[0]
-  }
+    ...coordResult.rows[0],
+    count: parseInt(countResult.rows[0].count, 10),
+  };
 }
 
-const server = http.createServer();
+// POST endpoint
+app.post('/', async (req, res) => {
+  const body = req.body;
 
-server.on("request", async (request, response) => {
-  let body = [];
+  if (!body.lat || !body.lon) {
+    return res.status(400).json({ error: "Missing coordinates" });
+  }
 
-  if (request.method === "POST") {
-    request.on('data', (chunk) => {
-      body.push(chunk);
-    }).on('end', () => {
-      body = JSON.parse(Buffer.concat(body).toString());
-      if (body.lon && body.lat) {
-        insertData(body);
-      } else {
-        console.log("no coordinates");
-      }
-    });
-    response.end();
-  } else if (request.method === "GET") {
-    if (request.url === "/health") {
-      response.setHeader("Content-Type", "application/json");
-      response.end(JSON.stringify( {
-        status: "ok",
-        uptime: process.uptime(),
-        timestamp: new Date().toISOString(),
-      }));
+  try {
+    const inserted = await insertData(body);
+    if (inserted) {
+      console.log(`Added lat: ${body.lat}, lon: ${body.lon}`);
+      res.status(201).json({ status: 'inserted' });
     } else {
-      const data = await getCoordinates();
-      response.setHeader("Content-Type", "application/json");
-      response.end(JSON.stringify(data));
+      console.log(`Duplicate lat: ${body.lat}, lon: ${body.lon}`);
+      res.status(200).json({ status: 'duplicate' });
     }
+  } catch (err) {
+    console.error('Insert error:', err);
+    res.status(500).json({ error: 'Database error' });
   }
 });
 
-server.listen(3000, () => console.log("Server running on port 3000"));
+// Health check
+app.get('/health', (req, res) => {
+  res.json({
+    status: "ok",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// GET latest location
+app.get('/', async (req, res) => {
+  try {
+    const data = await getCoordinates();
+    res.json(data);
+  } catch (err) {
+    console.error('Fetch error:', err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
