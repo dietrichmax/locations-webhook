@@ -1,65 +1,73 @@
 import { insertData, getLatestLocation } from "./methods"
-import { sendJSON } from "./utilities"
-import type { IncomingMessage, ServerResponse } from "http"
+import type { Request, Response } from "express"
 
 // ────────────────────────────────────────────────────────────
 // REQUEST HANDLERS
 // ────────────────────────────────────────────────────────────
 
 /**
- * Handles POST requests and inserts location data.
- * @param {http.IncomingMessage} req
- * @param {http.ServerResponse} res
+ * Handles POST /locations
+ * 
+ * @param req - Express request containing JSON body with `lat` and `lon`
+ * @param res - Express response
+ * 
+ * @returns 201 Created if location added, 409 Conflict if duplicate,
+ *          400 Bad Request if invalid input, 500 Internal Server Error on DB error
  */
 export async function handlePostLocations(
-  req: IncomingMessage,
-  res: ServerResponse
-) {
-  const chunks: Buffer[] = []
-  req.on("data", (chunk: Buffer) => chunks.push(chunk))
-  req.on("end", async () => {
-    try {
-      const body = JSON.parse(Buffer.concat(chunks).toString())
-      if (body.lat && body.lon) {
-        const inserted = await insertData(body)
-        const status = inserted ? 201 : 409
-        const message = inserted ? "Location added" : "Duplicate location"
-        console.log(`Added location: [${body.lat}, ${body.lon}]`)
-        sendJSON(res, status, { message })
-      } else {
-        sendJSON(res, 400, { error: "Missing lat or lon" })
-      }
-    } catch (err) {
-      console.error("POST parse error:", err)
-      sendJSON(res, 400, { error: "Invalid JSON format" })
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const { lat, lon } = req.body
+
+    if (typeof lat !== "number" || typeof lon !== "number") {
+      res.status(400).json({ error: "Missing or invalid 'lat' or 'lon'" })
+      return
     }
-  })
+
+    const inserted = await insertData({ lat, lon })
+    const status = inserted ? 201 : 409
+    const message = inserted ? "Location added" : "Duplicate location"
+    console.log(`Added location: [${lat}, ${lon}]`)
+    res.status(status).json({ message })
+  } catch (err) {
+    console.error("POST error:", err)
+    res.status(500).json({ error: "Internal Server Error" })
+  }
 }
 
 /**
- * Handles GET /locations/latest
+ * Handles GET /
+ * 
+ * @param req - Express request
+ * @param res - Express response
+ * 
+ * @returns 200 OK with the latest location or 500 Internal Server Error
  */
 export async function handleGetLatestLocation(
-  req: IncomingMessage,
-  res: ServerResponse
-){
+  req: Request,
+  res: Response
+): Promise<void> {
   try {
     const data = await getLatestLocation()
-    sendJSON(res, 200, data)
+    res.status(200).json(data)
   } catch (err) {
-    console.error("DB error:", err)
-    sendJSON(res, 500, { error: "Internal Server Error" })
+    console.error("GET error:", err)
+    res.status(500).json({ error: "Internal Server Error" })
   }
 }
 
 /**
  * Handles GET /health
+ * 
+ * @param req - Express request
+ * @param res - Express response
+ * 
+ * @returns 200 OK with server health status
  */
-export function handleHealth(
-  req: IncomingMessage,
-  res: ServerResponse
-) {
-  sendJSON(res, 200, {
+export function handleHealth(req: Request, res: Response): void {
+  res.status(200).json({
     status: "ok",
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
