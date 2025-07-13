@@ -30,7 +30,7 @@ app.use(express.json())
  * @route   POST /tracking/locations
  * @desc    Handle incoming location data from client
  */
-app.post("/tracking/locations", (req: Request, res: Response, next: NextFunction) => {
+app.post("/locations", (req: Request, res: Response, next: NextFunction) => {
   handlePostLocations(req, res).catch(next)
 })
 
@@ -38,7 +38,7 @@ app.post("/tracking/locations", (req: Request, res: Response, next: NextFunction
  * @route   GET /tracking
  * @desc    Get latest known location
  */
-app.get("/tracking", (req: Request, res: Response, next: NextFunction) => {
+app.get("/", (req: Request, res: Response, next: NextFunction) => {
   handleGetLatestLocation(req, res).catch(next)
 })
 
