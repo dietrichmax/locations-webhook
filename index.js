@@ -23,15 +23,18 @@ app.use(express.json());
  * Skips check for `/health` route.
  */
 app.use((req, res, next) => {
+  const logBody = ['POST', 'PUT', 'PATCH'].includes(req.method) ? JSON.stringify(req.body) : '{}';
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} - Query: ${JSON.stringify(req.query)} - Body: ${logBody}`);
+  
   if (req.path === '/health') return next();
 
-  const apiKey = req.query['api_key'];  // get api_key from URL query params
+  const apiKey = req.query['api_key'];
   if (!apiKey || apiKey !== process.env.API_KEY) {
     return res.status(401).json({ error: 'Unauthorized: Invalid or missing API key' });
   }
+  
   next();
 });
-
 
 
 /**
@@ -100,6 +103,8 @@ async function getCoordinates() {
  * POST / - Accepts new location data and inserts it if not a duplicate.
  */
 app.post('/', async (req, res) => {
+  console.log(`[${new Date().toISOString()}] Incoming POST / request with body:`, JSON.stringify(req.body));
+
   const body = req.body;
 
   if (!body.lat || !body.lon) {
