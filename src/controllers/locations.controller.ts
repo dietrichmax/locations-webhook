@@ -25,7 +25,7 @@ export async function postLocationHandler(req: Request, res: Response) {
     if (inserted) {
       res.status(201).json({ message: "Location added" })
     } else {
-      res.status(409).json({ error: "Duplicate location" })
+      res.status(208).json({ error: "Duplicate location" })
     }
   } catch (err) {
     console.error("POST error:", err)
