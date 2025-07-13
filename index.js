@@ -127,6 +127,7 @@ app.post('/', async (req, res) => {
 app.get('/', async (req, res) => {
   try {
     const data = await getCoordinates();
+    console.log('Fetched latest coordinates:', data); 
     res.json(data);
   } catch (err) {
     console.error('Fetch error:', err);
