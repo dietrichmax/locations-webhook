@@ -30,23 +30,41 @@ cd location-server
 Create a `locations` table:
 
 ```sql
-CREATE TABLE locations (
-  id SERIAL PRIMARY KEY,
-  lat DOUBLE PRECISION,
-  lon DOUBLE PRECISION,
-  acc DOUBLE PRECISION,
-  alt DOUBLE PRECISION,
-  batt DOUBLE PRECISION,
-  bs TEXT,
-  tst BIGINT,
-  vac DOUBLE PRECISION,
-  vel DOUBLE PRECISION,
-  conn TEXT,
-  topic TEXT,
-  inregions TEXT,
-  ssid TEXT,
-  bssid TEXT
+-- public.locations definition
+
+-- Drop table
+
+-- DROP TABLE public.locations;
+
+CREATE TABLE public.locations (
+	id bigserial NOT NULL,
+	created_at timestamptz DEFAULT CURRENT_TIMESTAMP NULL,
+	lat float8 NULL,
+	lon float8 NULL,
+	acc int4 NULL,
+	alt int4 NULL,
+	batt int4 NULL,
+	bs int4 NULL,
+	cog numeric(10, 2) NULL,
+	rad int4 NULL,
+	t varchar(255) NULL,
+	tid varchar(255) NULL,
+	tst int4 NULL,
+	vac int4 NULL,
+	vel int4 NULL,
+	p numeric(10, 2) NULL,
+	conn varchar(255) NULL,
+	topic varchar(255) NULL,
+	inregions jsonb NULL,
+	ssid varchar(255) NULL,
+	bssid varchar(255) NULL,
+	CONSTRAINT locations_pkey PRIMARY KEY (id),
+	CONSTRAINT unique_lat_lon UNIQUE (lat, lon)
 );
+CREATE INDEX alt_idx ON public.locations USING btree (alt);
+CREATE INDEX lat_idx ON public.locations USING btree (lat);
+CREATE INDEX lon_idx ON public.locations USING btree (lon);
+CREATE INDEX vel_idx ON public.locations USING btree (vel);
 ```
 
 Make sure your PostgreSQL credentials are set via environment variables or `.env`.

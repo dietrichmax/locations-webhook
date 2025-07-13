@@ -15,14 +15,14 @@ export async function insertData(body: LocationData) {
 
   const select = await pool.query(
     "SELECT lat, lon FROM locations WHERE lat = $1 AND lon = $2",
-    [body.lat, body.long]
+    [body.lat, body.lon]
   )
   if (
     select.rows[0] &&
     select.rows[0].lat === body.lat &&
-    select.rows[0].lon === body.long
+    select.rows[0].lon === body.lon
   ) {
-    console.log(`Duplicate location lat: ${body.lat}, lon: ${body.long}`)
+    console.log(`Duplicate location lat: ${body.lat}, lon: ${body.lon}`)
     return false // duplicate found
   }
 
@@ -31,7 +31,7 @@ export async function insertData(body: LocationData) {
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
     [
       body.lat,
-      body.long,
+      body.lon,
       body.acc,
       body.alt,
       body.batt,
@@ -47,7 +47,7 @@ export async function insertData(body: LocationData) {
     ]
   )
 
-  console.log(`Added location lat: ${body.lat}, lon: ${body.long}`)
+  console.log(`Added location lat: ${body.lat}, lon: ${body.lon}`)
   return true
 }
 
