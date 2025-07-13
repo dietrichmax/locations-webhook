@@ -1,5 +1,5 @@
 # Stage 1: Install dependencies + build TypeScript bundle
-FROM node:21-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /opt/app
 
@@ -15,7 +15,7 @@ COPY src ./src
 RUN npm run build
 
 # Stage 2: Create minimal runtime image
-FROM node:21-alpine AS runtime
+FROM node:22-alpine AS runtime
 
 WORKDIR /opt/app
 
