@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express"
+import { Request, Response, Router } from "express"
 import locationsRoutes from "./locations.routes"
 
 /**
@@ -17,14 +17,9 @@ const router = Router()
 // Mount routes under /
 router.use("/", locationsRoutes)
 
-router.get("/health", (_req, res) => {
-  res.status(200).json({ status: "ok", uptime: process.uptime() })
-})
-
 // Catch-all for unknown routes
 router.use((req: Request, res: Response) => {
   res.status(404).json({ error: "Not Found" })
 })
-
 
 export default router
