@@ -3,8 +3,7 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "dotenv": "^16.6.1",
-    "express": "^4.21.2",
-    "pg": "^8.16.3"
+    "express": "^4.21.1",
+    "pg": "^8.11.3"
   }
 }
