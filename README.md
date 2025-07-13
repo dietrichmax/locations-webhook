@@ -132,7 +132,7 @@ Submit GPS data as JSON:
 📌 Responds with:
 
 * `201 Created` on success
-* `409 Conflict` if duplicate
+* `208 Conflict` if duplicate
 * `400 Bad Request` if required fields are missing
 
 ---
