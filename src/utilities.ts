@@ -5,17 +5,6 @@ import type { IncomingMessage, ServerResponse } from "http"
 // ────────────────────────────────────────────────────────────
 
 /**
- * Logs an incoming HTTP request.
- * @param {http.IncomingMessage} req - The HTTP request object.
- */
-export function logRequest(req: IncomingMessage) {
-  const ip = req.socket.remoteAddress
-  console.log(
-    `[${new Date().toISOString()}] ${req.method} ${req.url} from ${ip}`
-  )
-}
-
-/**
  * Logs a response with status and payload.
  * @param {number} statusCode - HTTP status code.
  * @param {object} payload - Response payload.
