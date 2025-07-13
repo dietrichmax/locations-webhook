@@ -15,8 +15,6 @@ const server = http.createServer(async (
   req: IncomingMessage,
   res: ServerResponse
 ) => {
-  logRequest(req)
-
   const { method, url } = req
 
   if (method === "POST" && url === "/locations") {

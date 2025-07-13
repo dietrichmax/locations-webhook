@@ -24,6 +24,7 @@ export async function handlePostLocations(
         const inserted = await insertData(body)
         const status = inserted ? 201 : 409
         const message = inserted ? "Location added" : "Duplicate location"
+        console.log(`Added location: [${body.lat}, ${body.lon}]`)
         sendJSON(res, status, { message })
       } else {
         sendJSON(res, 400, { error: "Missing lat or lon" })
