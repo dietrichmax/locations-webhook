@@ -30,10 +30,10 @@ const server = http.createServer(async (
   const { method, url } = req
 
   console.log(`Received ${method} request for ${url}`)
-  
-  if (method === "POST" && url === "/locations") {
+
+  if (method === "POST" && url === "/tracking/locations") {
     await handlePostLocations(req, res)
-  } else if (method === "GET" && url === "/") {
+  } else if (method === "GET" && url === "/tracking") {
     await handleGetLatestLocation(req, res)
   } else if (method === "GET" && url === "/health") {
     handleHealth(req, res)

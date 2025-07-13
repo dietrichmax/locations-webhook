@@ -1,5 +1,11 @@
 node_modules
 Dockerfile
+.github
+dist/
+.gitignore
+.prettierignore
+.prettierrc.json
+post_test.py
 *.log
 *.env
 test/
