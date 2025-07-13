@@ -8,6 +8,9 @@ const PORT = process.env.PORT || 3000
 
 // Middleware
 app.use((req: Request, _res: Response, next: NextFunction): void => {
+  if (req.path === "/health") {
+    return next() // skip logging for health checks
+  }
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`)
   next()
 })
