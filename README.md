@@ -65,6 +65,8 @@ CREATE INDEX alt_idx ON public.locations USING btree (alt);
 CREATE INDEX lat_idx ON public.locations USING btree (lat);
 CREATE INDEX lon_idx ON public.locations USING btree (lon);
 CREATE INDEX vel_idx ON public.locations USING btree (vel);
+CREATE INDEX created_at_idx ON locations (created_at);
+CREATE INDEX lat_lon_idx ON locations (lat, lon);
 ```
 
 Make sure your PostgreSQL credentials are set via environment variables or `.env`.
