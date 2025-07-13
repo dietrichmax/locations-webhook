@@ -7,9 +7,9 @@ import {
 const router = Router()
 
 // GET / => latest location
-router.get("/", getLatestLocationHandler)
+router.get("/tracking", getLatestLocationHandler)
 
 // POST /locations => add new location
-router.post("/locations", postLocationHandler)
+router.post("/tracking/locations", postLocationHandler)
 
 export default router
