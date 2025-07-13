@@ -23,7 +23,7 @@ This project is a lightweight Node.js HTTP server (no Express) for receiving GPS
 ```bash
 git clone https://github.com/your-username/location-server.git
 cd location-server
-````
+```
 
 ### 2. Set up PostgreSQL
 
@@ -94,9 +94,9 @@ Submit GPS data as JSON:
 
 📌 Responds with:
 
-* `201 Created` on success
-* `409 Conflict` if duplicate
-* `400 Bad Request` if invalid/missing data
+- `201 Created` on success
+- `409 Conflict` if duplicate
+- `400 Bad Request` if invalid/missing data
 
 ---
 
@@ -134,11 +134,11 @@ Health check endpoint:
 
 You can configure the PostgreSQL connection using [node-postgres environment variables](https://node-postgres.com/features/connecting):
 
-* `PGHOST`
-* `PGUSER`
-* `PGPASSWORD`
-* `PGDATABASE`
-* `PGPORT`
+- `PGHOST`
+- `PGUSER`
+- `PGPASSWORD`
+- `PGDATABASE`
+- `PGPORT`
 
 Example `.env` (if using dotenv):
 
@@ -155,5 +155,7 @@ PGPORT=5432
 ## 📄 License
 
 MIT – use freely and modify for your needs.
+
+```
 
 ```

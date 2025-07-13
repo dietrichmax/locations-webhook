@@ -1,42 +1,43 @@
-# Stage 1: Build dependencies in a smaller layer
-FROM node:21-alpine AS deps
+# Stage 1: Install dependencies + build TypeScript bundle
+FROM node:21-alpine AS builder
 
-# Set working directory
 WORKDIR /opt/app
 
-# Install only production dependencies if NODE_ENV=production
-ENV NODE_ENV=production
-
-# Copy only package.json and lock file first to leverage Docker cache
+# Install build dependencies
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm ci --omit=dev
+# Copy source files
+COPY tsconfig.json webpack.config.js ./
+COPY src ./src
 
-# Stage 2: Copy source and run app
+# Build the webpack bundle (outputs dist/server.cjs)
+RUN npm run build
+
+# Stage 2: Create minimal runtime image
 FROM node:21-alpine AS runtime
 
 WORKDIR /opt/app
 
-# Copy installed node_modules from previous stage
-COPY --from=deps /opt/app/node_modules ./node_modules
+# Copy only production dependencies
+COPY package*.json ./
+RUN npm ci --omit=dev
 
-# Copy rest of the source files
-COPY . .
+# Copy the built bundle from builder stage
+COPY --from=builder /opt/app/dist ./dist
 
-# Expose app port
+# Expose port
 EXPOSE 3000
 
-# Health check script
+# Copy health check script
 COPY healthCheck.js ./healthCheck.js
 
-# Add basic container health check
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
   CMD node ./healthCheck.js || exit 1
 
-# Use non-root user for security
+# Create and use non-root user
 RUN addgroup -S app && adduser -S app -G app
 USER app
 
-# Default command
-CMD ["npm", "run", "start"]
+# Run the built bundle
+CMD ["node", "./dist/server.cjs"]
