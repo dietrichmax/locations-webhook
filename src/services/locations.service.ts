@@ -1,6 +1,6 @@
 const { Pool } = require("pg")
 const pool = new Pool()
-import type { LocationData } from "./types/types"
+import type { LocationData } from "../types/types"
 
 // ────────────────────────────────────────────────────────────
 // DATABASE METHODS
