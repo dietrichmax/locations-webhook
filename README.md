@@ -22,9 +22,9 @@ This project is a lightweight Express-based HTTP server written in TypeScript fo
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/location-server.git
-cd location-server
-````
+git clone https://github.com/dietrichmax/locations-webhook
+cd locations-webhook
+```
 
 ### 2. Set up PostgreSQL
 
