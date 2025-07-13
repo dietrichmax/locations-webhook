@@ -6,20 +6,25 @@ const express = require('express');
 const { Pool } = require('pg');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// PostgreSQL connection pool config (adjust as needed)
+// PostgreSQL connection pool
 const pool = new Pool({
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 });
 
+
 app.use(express.json());
 
-// Middleware to check for API key
+/**
+ * Middleware to check for API key in query parameters.
+ * Skips check for `/health` route.
+ */
 app.use((req, res, next) => {
   if (req.path === '/health') return next();
+
   const apiKey = req.query['api_key'];  // get api_key from URL query params
   if (!apiKey || apiKey !== process.env.API_KEY) {
     return res.status(401).json({ error: 'Unauthorized: Invalid or missing API key' });
@@ -29,7 +34,27 @@ app.use((req, res, next) => {
 
 
 
-// Insert data with duplication check
+/**
+ * Inserts a new location into the database if it doesn't already exist
+ * based on `lat` and `lon`.
+ *
+ * @param {Object} data - The location data.
+ * @param {number} data.lat - Latitude.
+ * @param {number} data.lon - Longitude.
+ * @param {number} [data.acc] - Accuracy.
+ * @param {number} [data.alt] - Altitude.
+ * @param {number} [data.batt] - Battery level.
+ * @param {string} [data.bs] - Base station.
+ * @param {number} [data.tst] - Timestamp.
+ * @param {string} [data.vac] - Vac mode.
+ * @param {number} [data.vel] - Velocity.
+ * @param {string} [data.conn] - Connection type.
+ * @param {string} [data.topic] - Topic.
+ * @param {string} [data.inregions] - Region info.
+ * @param {string} [data.ssid] - SSID.
+ * @param {string} [data.bssid] - BSSID.
+ * @returns {Promise<boolean>} - True if inserted, false if duplicate.
+ */
 async function insertData(body) {
   const query = `
     INSERT INTO locations (lat, lon, acc, alt, batt, bs, tst, vac, vel, conn, topic, inregions, ssid, bssid)
@@ -49,7 +74,16 @@ async function insertData(body) {
   return result.rowCount > 0; // true if inserted
 }
 
-// Get latest coordinates and count
+/**
+ * Retrieves the latest location entry and total number of records.
+ *
+ * @returns {Promise<Object>} Latest location data with total count.
+ * @returns {number} return.lat - Latitude.
+ * @returns {number} return.lon - Longitude.
+ * @returns {number} return.batt - Battery.
+ * @returns {string} return.bs - Base station.
+ * @returns {number} return.count - Total records.
+ */
 async function getCoordinates() {
   const [coordResult, countResult] = await Promise.all([
     pool.query("SELECT lat, lon, batt, bs FROM locations ORDER BY id DESC LIMIT 1"),
@@ -62,7 +96,9 @@ async function getCoordinates() {
   };
 }
 
-// POST endpoint
+/**
+ * POST / - Accepts new location data and inserts it if not a duplicate.
+ */
 app.post('/', async (req, res) => {
   const body = req.body;
 
@@ -85,16 +121,9 @@ app.post('/', async (req, res) => {
   }
 });
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({
-    status: "ok",
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// GET latest location
+/**
+ * GET / - Returns the most recent location data and total record count.
+ */
 app.get('/', async (req, res) => {
   try {
     const data = await getCoordinates();
@@ -105,7 +134,20 @@ app.get('/', async (req, res) => {
   }
 });
 
-// Start server
+/**
+ * GET /health - Returns server uptime and health check info.
+ */
+app.get('/health', (req, res) => {
+  res.json({
+    status: "ok",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
+/**
+ * Starts the Express server.
+ */
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
