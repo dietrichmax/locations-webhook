@@ -21,8 +21,7 @@ app.use((req: Request, _res: Response, next: NextFunction): void => {
 app.use(express.json())
 
 // Mount api protected locations routes at root
-//app.use("/", authenticateApiKey, routes)
-app.use("/", routes)
+app.use("/", authenticateApiKey, routes)
 
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok", uptime: process.uptime() })
