@@ -11,6 +11,12 @@ const app = express()
 // Middleware
 // ────────────────────────────────────────────────────────────
 
+// Logging middleware
+app.use((req: Request, _res: Response, next: NextFunction): void => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`)
+  next()
+})
+
 /**
  * JSON body parser middleware
  */

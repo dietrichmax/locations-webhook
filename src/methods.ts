@@ -9,8 +9,6 @@ import type { LocationData } from "./types/types"
 /**
  * Inserts a location into the database if it's not a duplicate.
  * @param {LocationData} body - Location data.
- * @param {number} body.lat - Latitude.
- * @param {number} body.lon - Longitude.
  * @returns {Promise<boolean>} - Returns true if inserted, false if duplicate.
  */
 export async function insertData(body: LocationData) {
