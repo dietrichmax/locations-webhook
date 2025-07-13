@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express"
 import routes from "./routes"
+import { authenticateApiKey } from "./middlewares/apiKeyAuth"
 
 const app = express()
 
@@ -14,7 +15,7 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
 app.use(express.json())
 
 // Mount locations routes at root
-app.use("/", routes)
+app.use("/", authenticateApiKey, routes)
 
 // Global error handler
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
