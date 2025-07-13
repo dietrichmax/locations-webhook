@@ -19,12 +19,12 @@ export async function getLatestLocationHandler(req: Request, res: Response) {
  */
 export async function postLocationHandler(req: Request, res: Response) {
   try {
-    const { lat, lon } = req.body
-    if (lat == null || lon == null) {
+    const { lat, long } = req.body
+    if (lat == null || long == null) {
       return res.status(400).json({ error: "Missing lat or lon" })
     }
 
-    const inserted = await insertData({ lat, lon })
+    const inserted = await insertData({ lat, long })
     if (inserted) {
       res.status(201).json({ message: "Location added" })
     } else {

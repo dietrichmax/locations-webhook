@@ -1,6 +1,6 @@
 export interface LocationData {
   lat: number
-  lon: number
+  long: number
   acc?: number
   alt?: number
   batt?: number
