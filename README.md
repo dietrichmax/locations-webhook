@@ -123,7 +123,7 @@ Submit GPS data as JSON:
   "vel": 0,
   "conn": "wifi",
   "topic": "device/location",
-  "inregions": {"region": "A"},
+  "inregions": { "region": "A" },
   "ssid": "myWiFi",
   "bssid": "00:11:22:33:44:55"
 }
@@ -131,9 +131,9 @@ Submit GPS data as JSON:
 
 📌 Responds with:
 
-* `201 Created` on success
-* `208 Conflict` if duplicate
-* `400 Bad Request` if required fields are missing
+- `201 Created` on success
+- `208 Conflict` if duplicate
+- `400 Bad Request` if required fields are missing
 
 ---
 

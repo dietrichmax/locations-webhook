@@ -12,7 +12,6 @@ import type { LocationData } from "../types/types"
  * @returns {Promise<boolean>} - Returns true if inserted, false if duplicate.
  */
 export async function insertData(body: LocationData) {
-
   const select = await pool.query(
     "SELECT lat, lon FROM locations WHERE lat = $1 AND lon = $2",
     [body.lat, body.lon]

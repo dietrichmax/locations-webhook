@@ -21,13 +21,11 @@ app.get("/health", (_req, res) => {
 // Mount api protected locations routes at root
 app.use("/", authenticateApiKey, routes)
 
-
 // Global error handler
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   console.error("Internal Server Error:", err)
   res.status(500).json({ error: "Internal Server Error" })
 })
-
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))

@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import { insertData, getLatestLocation } from "../services/locations.service"
+import type { LocationData } from "../types/types"
 
 /**
  * Get the latest location data.
@@ -21,11 +22,26 @@ export async function postLocationHandler(req: Request, res: Response) {
   try {
     const { lat, lon } = req.body
 
-    const inserted = await insertData({ lat, lon })
+    console.log("Incoming request body:", req.body)
+
+    const isValid =
+      typeof lat === "number" &&
+      typeof lon === "number" &&
+      lat >= -90 &&
+      lat <= 90 &&
+      lon >= -180 &&
+      lon <= 180
+
+    if (!isValid) {
+      console.warn("Invalid lat/lon received, ignoring:", { lat, lon })
+      return res.status(200).json({ message: "Ignored invalid input" })
+    }
+    
+    const inserted = await insertData({ lat, lon } as LocationData)
     if (inserted) {
       res.status(201).json({ message: "Location added" })
     } else {
-      res.status(208).json({ error: "Duplicate location" })
+      res.status(200).json({ error: "Duplicate location" })
     }
   } catch (err) {
     console.error("POST error:", err)
