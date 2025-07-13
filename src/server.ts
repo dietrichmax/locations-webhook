@@ -9,12 +9,6 @@ const PORT = process.env.PORT || 3000
 // Middleware
 app.use((req: Request, _res: Response, next: NextFunction): void => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`)
-  
-  // Only log body for requests that might have one
-  if (["POST", "PUT", "PATCH"].includes(req.method)) {
-    console.log("Request Body:", JSON.stringify(req.body, null, 2))
-  }
-
   next()
 })
 
