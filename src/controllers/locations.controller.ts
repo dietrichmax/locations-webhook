@@ -19,9 +19,9 @@ export async function getLatestLocationHandler(req: Request, res: Response) {
  */
 export async function postLocationHandler(req: Request, res: Response) {
   try {
-    const { lat, long } = req.body
-    
-    const inserted = await insertData({ lat, long })
+    const { lat, lon } = req.body
+
+    const inserted = await insertData({ lat, lon })
     if (inserted) {
       res.status(201).json({ message: "Location added" })
     } else {
