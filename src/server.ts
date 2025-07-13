@@ -1,45 +1,79 @@
-const http = require("http")
+import express, { Request, Response, NextFunction } from "express"
 import {
   handleGetLatestLocation,
   handlePostLocations,
   handleHealth,
 } from "./handlers"
-import { sendJSON } from "./utilities"
-import type { IncomingMessage, ServerResponse } from "http"
+
+const app = express()
 
 // ────────────────────────────────────────────────────────────
-// SERVER
+// Middleware
 // ────────────────────────────────────────────────────────────
 
 /**
- * Creates and starts an HTTP server that handles incoming requests.
- * 
- * Routes:
- * - POST /locations       : Handles posting new location data.
- * - GET  /               : Retrieves the latest location.
- * - GET  /health         : Returns server health status.
- * - All other routes     : Responds with 404 Not Found.
- * 
- * @listens 3000
- * @fires console.log When the server starts listening.
+ * JSON body parser middleware
  */
-const server = http.createServer(async (
-  req: IncomingMessage,
-  res: ServerResponse
-) => {
-  const { method, url } = req
+app.use(express.json())
 
-  console.log(`Received ${method} request for ${url}`)
+// ────────────────────────────────────────────────────────────
+// Routes
+// ────────────────────────────────────────────────────────────
 
-  if (method === "POST" && url === "/tracking/locations") {
-    await handlePostLocations(req, res)
-  } else if (method === "GET" && url === "/tracking") {
-    await handleGetLatestLocation(req, res)
-  } else if (method === "GET" && url === "/health") {
-    handleHealth(req, res)
-  } else {
-    sendJSON(res, 404, { error: "Not Found" })
-  }
+/**
+ * @route   POST /locations
+ * @desc    Handle incoming location data from client
+ */
+app.post("/locations", (req: Request, res: Response, next: NextFunction) => {
+  handlePostLocations(req, res).catch(next)
 })
 
-server.listen(3000, () => console.log("Server running on port 3000"))
+/**
+ * @route   GET /
+ * @desc    Get latest known location
+ */
+app.get("/", (req: Request, res: Response, next: NextFunction) => {
+  handleGetLatestLocation(req, res).catch(next)
+})
+
+/**
+ * @route   GET /health
+ * @desc    Health check endpoint
+ */
+app.get("/health", handleHealth)
+
+// ────────────────────────────────────────────────────────────
+// 404 Handler
+// ────────────────────────────────────────────────────────────
+
+/**
+ * Catch-all for unknown routes
+ */
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ error: "Not Found" })
+})
+
+// ────────────────────────────────────────────────────────────
+// Error Handler
+// ────────────────────────────────────────────────────────────
+
+/**
+ * Global error handler
+ */
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
+  console.error("Internal Server Error:", err)
+  res.status(500).json({ error: "Internal Server Error" })
+})
+
+// ────────────────────────────────────────────────────────────
+// Start Server
+// ────────────────────────────────────────────────────────────
+
+const PORT = 3000
+
+/**
+ * Start the Express HTTP server
+ */
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
