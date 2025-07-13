@@ -1,9 +1,13 @@
 {
   "scripts": {
+    "format": "prettier --write .",
     "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.21.1",
     "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
   }
 }
