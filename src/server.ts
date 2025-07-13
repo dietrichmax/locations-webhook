@@ -21,7 +21,7 @@ const server = http.createServer(async (
 
   if (method === "POST" && url === "/locations") {
     await handlePostLocations(req, res)
-  } else if (method === "GET" && url === "/locations/latest") {
+  } else if (method === "GET" && url === "/") {
     await handleGetLatestLocation(req, res)
   } else if (method === "GET" && url === "/health") {
     handleHealth(req, res)
