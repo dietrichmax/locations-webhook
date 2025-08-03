@@ -20,7 +20,7 @@ export async function getLatestLocationHandler(req: Request, res: Response) {
  */
 export async function postLocationHandler(req: Request, res: Response) {
   try {
-    const { lat, lon, alt } = req.body
+    const { lat, lon, alt, acc, batt, bs, cog, rad, t, tid, tst, vac, vel, p, conn, topic, inregions, ssid, bssid } = req.body
 
     console.log("Incoming request body:", req.body)
 
@@ -33,11 +33,11 @@ export async function postLocationHandler(req: Request, res: Response) {
       lon <= 180
 
     if (!isValid) {
-      console.warn("Invalid lat/lon received, ignoring:", { lat, lon })
+      console.warn("Invalid lat/lon received, ignoring:", { lat, lon})
       return res.status(200).json({ message: "Ignored invalid input" })
     }
     
-    const inserted = await insertData({ lat, lon, alt } as LocationData)
+    const inserted = await insertData({ lat, lon, alt, acc, batt, bs, cog, rad, t, tid, tst, vac, vel, p, conn, topic, inregions, ssid, bssid } as LocationData)
     if (inserted) {
       res.status(201).json({ message: "Location added" })
     } else {
