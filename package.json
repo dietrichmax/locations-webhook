@@ -7,7 +7,7 @@
   },
   "type": "module",
   "dependencies": {
-    "express": "^4.21.2",
+    "express": "^4.22.1",
     "pg": "^8.11.3",
     "save-dev": "^0.0.1-security",
     "webpack": "^5.100.1"
