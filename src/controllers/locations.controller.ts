@@ -22,7 +22,7 @@ export async function postLocationHandler(req: Request, res: Response) {
   try {
     const { lat, lon, alt, acc, batt, bs, cog, rad, t, tid, tst, vac, vel, p, conn, topic, inregions, ssid, bssid } = req.body
 
-    console.log("Incoming request body:", req.body)
+    //console.log("Incoming request body:", req.body)
 
     const isValid =
       typeof lat === "number" &&
