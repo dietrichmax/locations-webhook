@@ -3,6 +3,13 @@ const pool = new Pool()
 import type { LocationData } from "../types/types"
 
 // ────────────────────────────────────────────────────────────
+// DAWARICH CONFIG
+// ────────────────────────────────────────────────────────────
+
+const DAWARICH_URL = process.env.DAWARICH_URL
+const DAWARICH_API_KEY = process.env.DAWARICH_API_KEY
+
+// ────────────────────────────────────────────────────────────
 // DATABASE METHODS
 // ────────────────────────────────────────────────────────────
 
@@ -47,6 +54,29 @@ export async function insertData(body: LocationData) {
   )
 
   console.log(`Added location lat: ${body.lat}, lon: ${body.lon}`)
+
+  // ────────────────────────────────────────────────────────────
+  // FORWARD TO DAWARICH (fire-and-forget)
+  // ────────────────────────────────────────────────────────────
+  fetch(`${DAWARICH_URL}?api_key=${DAWARICH_API_KEY}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  })
+    .then(async (res) => {
+      if (!res.ok) {
+        console.warn(
+          "Dawarich rejected request:",
+          await res.text()
+        )
+      }
+    })
+    .catch((err) => {
+      console.error("Failed to forward to Dawarich:", err)
+    })
+
   return true
 }
 
