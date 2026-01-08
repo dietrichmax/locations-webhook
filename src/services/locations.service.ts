@@ -53,7 +53,7 @@ export async function insertData(body: LocationData) {
     ]
   )
 
-  console.log(`Added location lat: ${body.lat}, lon: ${body.lon}`)
+  console.log(`[postgis] Added location lat: ${body.lat}, lon: ${body.lon}`)
 
   // ────────────────────────────────────────────────────────────
   // FORWARD TO DAWARICH (fire-and-forget)
@@ -71,6 +71,8 @@ export async function insertData(body: LocationData) {
           "Dawarich rejected request:",
           await res.text()
         )
+      } else {
+        console.log(`[dawarich] Added location lat: ${body.lat}, lon: ${body.lon}`)
       }
     })
     .catch((err) => {
